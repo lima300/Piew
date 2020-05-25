@@ -1,0 +1,77 @@
+{% extends 'core/layout.html' %}
+
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static "core/css/index.css" %}">
+{% endblock style %}
+
+{% block  body %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Piew</a>
+        <form class="form-inline" action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+            <div class="md-form my-0">
+                <input name="ss" class="form-control mr-sm-2" type="text" placeholder="Enter a username">
+            </div>
+            <button class="btn btn-outline-white btn-md my-2 my-sm-0 ml-3" type="submit">Search</button>
+        </form>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+            <a class="nav-link" href="{% url 'user' user.id %}">{{user.username}}</a>
+            </li>
+            <li class="nav-item active">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+        </ul>
+        </div>
+    </div>
+    </nav>
+    <br>
+    <br>    
+    <br>
+    <center>
+        <div class="card-signin center-align">
+            <img src="{{MEDIA_URL}}{{useR.image.image.url}}" height="120" width="120"/>
+            <h2>{{useR.username}}</h2>
+            <div style="color: #007bff;">
+                {% if user.id != useR.id %}
+                    {% if useR in user.following.all %}
+                        <a href="{% url 'unfollow' useR.id %}">unfollow-</a>
+                    {% else %}
+                        <a href="{% url 'follow' useR.id %}">follow+</a>
+                    
+                    {% endif %}
+                <br>
+                {% else %}
+                    <a href="{% url 'avatar' %}">change avatar</a>
+                    <br>
+                {% endif %}
+                <a href="{% url 'followers' useR.id %}">followers: {{fr}}</a>
+                <a href="{% url 'following' useR.id %}">following: {{fi}}</a>
+            </div>
+            <div class="dropdown-divider"></div>
+            {% if piews %}
+                {% for piew in piews %}
+                    <div class="piew">
+                        <spam class="name">{{piew.user.username}} says: </spam>
+                        <spam>{{piew.content}}</spam>
+                        {% if  user.id not in piew.likes.all %}
+                            <a href="{% url 'like' piew.id %}"><img src="{% static "core/Like_icon-icons.com_55878.svg" %}" width="20" height="20"></img></a>
+                        {% endif %}
+                        <a href="{% url 'comment' piew.id %}"><img src="{% static "core/commentdiscussion_106382.svg" %}" width="20" height="20"></img></a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                {% endfor %}
+            {% else %}
+                <spam>{{useR.username}} have not posted yet...</spam>
+            {% endif %}
+        </div>
+    </center>
+
+{% endblock body %}

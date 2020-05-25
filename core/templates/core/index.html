@@ -1,0 +1,78 @@
+{% extends 'core/layout.html' %}
+
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static "core/css/index.css" %}">
+{% endblock style %}
+
+{% block  body %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Piew</a>
+        <form class="form-inline" action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+            <div class="md-form my-0">
+                <input name="ss" class="form-control mr-sm-2" type="text" placeholder="Enter a username">
+            </div>
+            <button class="btn btn-outline-white btn-md my-2 my-sm-0 ml-3" type="submit">Search</button>
+        </form>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+            <a class="nav-link" href="{% url 'user' user.id %}">{{user.username}}</a>
+            </li>
+            <li class="nav-item active">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+        </ul>
+        </div>
+    </div>
+    </nav>
+    <br>
+    <br>    
+    <br>
+    <center>
+        <div class="card-signin center-align">
+            <form id="form" action="{% url 'piew' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+                <div class="form-group">
+                <label for="exampleFormControlTextarea1">What is going on?</label>
+                <textarea name="content" class="form-control" id="content" rows="3" maxlength="200"></textarea>
+                </div>
+                <input type="file" name="image" accept="image/*">
+                <button class="btn btn-lg btn-primary btn-block btn-login text-uppercase font-weight-bold mb-2" type="submit">send</button>
+            </form>
+            {% if piews %}
+                <div class="dropdown-divider"></div>
+                {% for piew in piews %}
+                    {% if piew.user in user.following.all or piew.user == user %}
+                        <div class="piew">
+                        <img src="{{MEDIA_URL}}{{piew.user.image.image.url}}" height="60" width="60"/>
+                            <spam class="name"><a href="{% url 'user' piew.user.id %}">{{piew.user.username}}</a> says: </spam>
+                            <spam>{{piew.content}}</spam>
+                            {% if  user not in piew.likes.all %}
+                                <a href="{% url 'like' piew.id %}"><img src="{% static "core/Like_icon-icons.com_55878.svg" %}" width="20" height="20"></img></a>
+                            {% else %}
+                                <a href="{% url 'dislike' piew.id %}"><img src="{% static "core/Like_icon-icons.com_55878.png" %}" width="20" height="20"></img></a>
+                            {% endif %}
+                            <a href="{% url 'likes' piew.id %}">{{piew.like_counter}}</a>
+                            <a href="{% url 'comment' piew.id %}"><img src="{% static "core/commentdiscussion_106382.svg" %}" width="20" height="20"></img></a>
+                            {% if user == piew.user %}
+                                <a href="{% url 'delete_piew' piew.id %}"><img src="{% static "core/x_106506.svg" %}" width="20" height="20"></img></a>
+                            {% endif %}
+                            {% if piew.image %}
+                                <br>
+                                <img src="{{MEDIA_URL}}{{piew.image.url}}" height="300" width="300"/>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </center>
+
+{% endblock body %}

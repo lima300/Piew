@@ -1,0 +1,69 @@
+{% extends 'core/layout.html' %}
+
+{% load static %}
+{% block style %}
+    <link rel="stylesheet" href="{% static "core/css/index.css" %}">
+{% endblock style %}
+
+{% block  body %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Piew</a>
+        <form class="form-inline" action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+            <div class="md-form my-0">
+                <input name="ss" class="form-control mr-sm-2" type="text" placeholder="Enter a username">
+            </div>
+            <button class="btn btn-outline-white btn-md my-2 my-sm-0 ml-3" type="submit">Search</button>
+        </form>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+            <a class="nav-link" href="{% url 'user' user.id %}">{{user.username}}</a>
+            </li>
+            <li class="nav-item active">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+        </ul>
+        </div>
+    </div>
+    </nav>
+    <br>
+    <br>
+    <br>
+    <center>
+        <div class="card-signin center-align">
+            <div class="piew">
+                <spam class="name">{{piew.user.username}} says: </spam>
+                <spam>{{piew.content}}</spam>
+            </div>
+            <form id="form" action="{% url 'comment' piew.id %}" method="POST">
+            {% csrf_token %}
+                <div class="form-group">
+                <label for="exampleFormControlTextarea1">Comment:</label>
+                <textarea name="comment" class="form-control" id="content" rows="3" maxlength="200"></textarea>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block btn-login text-uppercase font-weight-bold mb-2" type="submit">send</button>
+            </form>
+            {% if comments %}
+                <div class="dropdown-divider"></div>
+                {% for comment in comments %}
+                    <div class="piew">
+                    <img src="{{MEDIA_URL}}{{comment.user.image.image.url}}" height="60" width="60"/>
+                        <spam class="name"><a href="{% url 'user' comment.user.id %}">{{comment.user.username}}</a> says: </spam>
+                        <spam>{{comment.content}}</spam>
+                        {% if user == comment.user %}
+                            <a href="{% url 'delete_comment' comment.id %}"><img src="{% static "core/x_106506.svg" %}" width="20" height="20"></img></a>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown-divider"></div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </center>
+
+{% endblock body %}
